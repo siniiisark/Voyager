@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space News</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #1c1c1c, #0a0a0a);
+            color: white;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        header h1 {
+            margin: 0;
+        }
+        #news-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .news-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+        .news-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.4);
+        }
+        .news-card h2 {
+            font-size: 1.5em;
+        }
+        .news-card p {
+            font-size: 1em;
+        }
+        .news-card a {
+            color: #00d4ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .news-card a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Space News</h1>
+        <p>Stay updated with the latest news from space</p>
+    </header>
+    <div id="news-container"></div>
+
+    <script>
+        async function fetchSpaceNews() {
+            const apiUrl = "https://api.spaceflightnewsapi.net/v4/articles";
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                const newsContainer = document.getElementById('news-container');
+                data.results.forEach(article => {
+                    const newsCard = document.createElement('div');
+                    newsCard.className = 'news-card';
+
+                    newsCard.innerHTML = `
+                        <h2>${article.title}</h2>
+                        <p>${article.summary}</p>
+                        <a href="${article.url}" target="_blank">Read more</a>
+                    `;
+
+                    newsContainer.appendChild(newsCard);
+                });
+            } catch (error) {
+                console.error("Failed to fetch news:", error);
+            }
+        }
+
+        fetchSpaceNews();
+    </script>
+</body>
+</html>

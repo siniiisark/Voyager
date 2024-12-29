@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astronomy Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background:linear-gradient(black,purple);
+            height: 1000px;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .quiz-container {
+            width: 80%;
+            background:linear-gradient(130deg,grey,rgb(92, 89, 89));
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+        .intro-message {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #ecedf4;
+        }
+        h1 {
+            text-align: center;
+            color: #e8e9ee;
+        }
+        .question {
+            display: none;
+            margin-bottom: 20px;
+        }
+        .answers {
+            display: flex;
+            flex-direction: column;
+        }
+        .answer-button {
+            margin: 5px 0;
+            padding: 10px;
+            border: none;
+            background-color: #0e0e0f;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .answer-button:hover {
+            background-color: #3949ab;
+        }
+        .answer-button.selected {
+            background-color: #ffcc00;
+            color: black;
+        }
+        .submit-btn {
+            background-color: #ffcc00;
+            color: black;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .submit-btn:hover {
+            background-color: #ffb300;
+        }
+        .navigation-btns {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .result {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border: 1px solid #1b5e20;
+            border-radius: 5px;
+            color: #1b5e20;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="intro-message" id="intro-message">
+        Are you ready to test your knowledge?
+        <button class="submit-btn" onclick="startQuiz()">Start Quiz</button>
+    </div>
+
+    <div class="quiz-container" id="quiz-container">
+        <h1>Astronomy Quiz</h1>
+        <div class="question" id="question-1">
+            <p>1. What year was the International Space Station (ISS) launched?</p>
+            <div class="answers">
+                <button class="answer-button" data-correct="false">2000</button>
+                <button class="answer-button" data-correct="true">1998</button>
+                <button class="answer-button" data-correct="false">2002</button>
+                <button class="answer-button" data-correct="false">2005</button>
+            </div>
+        </div>
+
+        <div class="question" id="question-2">
+            <p>2. Who was the first human to travel to space?</p>
+            <div class="answers">
+                <button class="answer-button" data-correct="true">Yuri Gagarin</button>
+                <button class="answer-button" data-correct="false">Neil Armstrong</button>
+                <button class="answer-button" data-correct="false">Buzz Aldrin</button>
+                <button class="answer-button" data-correct="false">John Glenn</button>
+            </div>
+        </div>
+
+        <div class="question" id="question-3">
+            <p>3. What is the largest planet in our solar system?</p>
+            <div class="answers">
+                <button class="answer-button" data-correct="true">Jupiter</button>
+                <button class="answer-button" data-correct="false">Saturn</button>
+                <button class="answer-button" data-correct="false">Neptune</button>
+                <button class="answer-button" data-correct="false">Uranus</button>
+            </div>
+        </div>
+
+        <div class="question" id="question-4">
+            <p>4. Which spacecraft landed the first humans on the Moon?</p>
+            <div class="answers">
+                <button class="answer-button" data-correct="true">Apollo 11</button>
+                <button class="answer-button" data-correct="false">Apollo 13</button>
+                <button class="answer-button" data-correct="false">Apollo 10</button>
+                <button class="answer-button" data-correct="false">Apollo 8</button>
+            </div>
+        </div>
+
+        <div class="question" id="question-5">
+            <p>5. What is the closest star to Earth besides the Sun?</p>
+            <div class="answers">
+                <button class="answer-button" data-correct="true">Proxima Centauri</button>
+                <button class="answer-button" data-correct="false">Alpha Centauri</button>
+                <button class="answer-button" data-correct="false">Sirius</button>
+                <button class="answer-button" data-correct="false">Betelgeuse</button>
+            </div>
+        </div>
+
+        <div class="navigation-btns">
+            <button class="submit-btn" id="prev-btn" onclick="changeQuestion(-1)" style="display:none;">Previous</button>
+            <button class="submit-btn" id="next-btn" onclick="changeQuestion(1)" style="display:none;">Next</button>
+        </div>
+
+        <button class="submit-btn" id="submit-btn" onclick="checkAnswers()">Submit Answers</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const totalQuestions = 5;
+        let currentQuestion = 1;
+        let selectedAnswers = {};
+
+        function startQuiz() {
+            document.getElementById('intro-message').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('next-btn').style.display = 'block';
+            showQuestion(currentQuestion);
+        }
+
+        function showQuestion(questionNumber) {
+            const questions = document.querySelectorAll('.question');
+            questions.forEach((question, index) => {
+                question.style.display = index + 1 === questionNumber ? 'block' : 'none';
+            });
+
+            // Handle navigation buttons
+            document.getElementById('prev-btn').style.display = questionNumber > 1 ? 'block' : 'none';
+            document.getElementById('next-btn').style.display = questionNumber < totalQuestions ? 'block' : 'none';
+            document.getElementById('submit-btn').style.display = questionNumber === totalQuestions ? 'block' : 'none';
+
+            // Reset answer selection
+            const answerButtons = document.querySelectorAll(`#question-${questionNumber} .answer-button`);
+            answerButtons.forEach(button => {
+                button.classList.remove('selected');
+                button.onclick = () => selectAnswer(questionNumber, button);
+            });
+
+            // Restore previous selection if exists
+            if (selectedAnswers[questionNumber]) {
+                selectedAnswers[questionNumber].classList.add('selected');
+            }
+        }
+
+        function selectAnswer(questionNumber, button) {
+            const answerButtons = document.querySelectorAll(`#question-${questionNumber} .answer-button`);
+            answerButtons.forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            selectedAnswers[questionNumber] = button;
+        }
+
+        function changeQuestion(direction) {
+            currentQuestion += direction;
+            showQuestion(currentQuestion);
+        }
+
+        function checkAnswers() {
+            let correctAnswers = 0;
+            let result = document.getElementById('result');
+            result.style.display = 'block';
+            result.innerHTML = '';
+
+            const questions = document.querySelectorAll('.question');
+            questions.forEach((question, index) => {
+                const buttons = question.querySelectorAll('.answer-button');
+                buttons.forEach(button => {
+                    if (button.getAttribute('data-correct') === 'true') {
+                        button.style.backgroundColor = '#1b5e20';
+                        button.style.color = 'white';
+
+                        // Check if the correct answer was selected
+                        if (selectedAnswers[index + 1] === button) {
+                            correctAnswers++;
+                        }
+                    } else {
+                        button.style.backgroundColor = '#d32f2f';
+                        button.style.color = 'white';
+                    }
+                });
+            });
+
+            result.innerHTML = `You got ${correctAnswers} out of ${totalQuestions} questions correct!`;
+            
+            // Disable further interactions
+            const allButtons = document.querySelectorAll('.answer-button');
+            allButtons.forEach(button => {
+                button.onclick = null;
+                button.style.cursor = 'default';
+            });
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('prev-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
